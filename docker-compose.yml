@@ -5,19 +5,19 @@ services:
     image: mongo:4.0.1-xenial
     network_mode: host
 
+  neo4j:
+    image: neo4j:3.4.7
+    network_mode: host
+    environment:
+      NEO4J_AUTH: none
+
   influxdb:
     image: influxdb:1.6.2-alpine
     network_mode: host
-    #ports:
-    #- "8086:8086"
 
   grafana:
     image: grafana/grafana:5.2.4
     network_mode: host
-    #ports:
-    #- "3000:3000"
-    #links:
-    #- influxdb
 
   telegraf:
     image: telegraf:1.7.4-alpine

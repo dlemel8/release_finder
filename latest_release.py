@@ -2,35 +2,15 @@ import asyncio
 import time
 from datetime import datetime
 
-import aiohttp
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import ReturnDocument
 
-START = time.time()
+from common import REPOS, get_request
 
-REPOS = [
-    'python/cpython',
-    # 'golang/go',
-    'docker/docker-ce',
-    'docker/compose',
-    # 'linuxkit/linuxkit',
-    # # 'ansible/ansible',
-    # 'metacloud/molecule',
-    # 'pytest-dev/pytest',
-    # # 'jenkinsci/jenkins',
-    # 'mysql/mysql-server',
-    # 'nginx/nginx',
-    # 'haproxy/haproxy',
-]
+START = time.time()
 
 RELEASES_URL_FORMAT = 'https://api.github.com/repos/{:s}/releases'
 TAGS_URL_FORMAT = 'https://api.github.com/repos/{:s}/tags'
-
-
-async def get_request(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            return await response.json()
 
 
 async def upsert_information(collection, name, version, **kargs):
@@ -67,4 +47,4 @@ async def main():
 # asyncio.run(main())
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
-
+loop.close()

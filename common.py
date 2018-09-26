@@ -1,3 +1,5 @@
+import asyncio
+
 import aio_pika
 import aiohttp
 from aio_pika import ExchangeType
@@ -23,6 +25,19 @@ async def get_request(url, headers=None):
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             return await response.json()
+
+
+async def consume_queue(queue_name, process_message_func):
+    connection = await connect_rabbitmq(asyncio.get_running_loop())
+    async with connection:
+        channel = await connection.channel()
+        exchange = await init_exchange(channel)
+        queue = await init_queue(channel, exchange, queue_name)
+        async for message in queue:
+            with message.process():
+                body = message.body.decode("utf-8")
+                print(f'got from queue: {body}')
+                await process_message_func(body)
 
 
 async def connect_rabbitmq(loop):

@@ -1,12 +1,10 @@
 import asyncio
-import time
 
 from neo4j.v1 import GraphDatabase
 
-from common import get_request, REPOS
+from common import connect_rabbitmq, init_queue, init_exchange, get_request
 
-START = time.time()
-
+QUEUE_NAME = 'topics'
 TOPICS_URL_FORMAT = 'https://api.github.com/repos/{:s}/topics'
 
 
@@ -26,19 +24,19 @@ def merge_information(session, repo_full_name, topics):
 
 
 async def main():
-    topics_futures = [get_topics(r) for r in REPOS]
-    done, _ = await asyncio.wait(topics_futures)
-    assert len(done) == len(topics_futures)
-    results = [x.result() for x in done]
-    print(results)
+    connection = await connect_rabbitmq(asyncio.get_running_loop())
+    async with connection:
+        channel = await connection.channel()
+        exchange = await init_exchange(channel)
+        queue = await init_queue(channel, exchange, QUEUE_NAME)
+        async for message in queue:
+            with message.process():
+                repo_full_name = message.body.decode("utf-8")
+                print(f'got for queue: {repo_full_name}')
+                topics = await get_topics(repo_full_name)
+                driver = GraphDatabase.driver('bolt://localhost:7687')
+                with driver.session() as session:
+                    merge_information(session, repo_full_name, topics)
 
-    driver = GraphDatabase.driver('bolt://localhost:7687')
-    with driver.session() as session:
-        for i in range(len(REPOS)):
-            merge_information(session, REPOS[i], results[i])
 
-    print("Process took: {:.2f} seconds".format(time.time() - START))
-
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
-loop.close()
+asyncio.run(main())

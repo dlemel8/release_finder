@@ -1,28 +1,16 @@
 version: "3"
 
 services:
-  mongo:
+  tasks_queue:
+    image: rabbitmq:3.7.8-management-alpine
+    network_mode: host
+
+  releases_db:
     image: mongo:4.0.1-xenial
     network_mode: host
 
-  neo4j:
+  topics_db:
     image: neo4j:3.4.7
     network_mode: host
     environment:
       NEO4J_AUTH: none
-
-  influxdb:
-    image: influxdb:1.6.2-alpine
-    network_mode: host
-
-  grafana:
-    image: grafana/grafana:5.2.4
-    network_mode: host
-
-  telegraf:
-    image: telegraf:1.7.4-alpine
-    network_mode: host
-    volumes:
-    - $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    - /var/run/docker.sock:/var/run/docker.sock
-

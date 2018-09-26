@@ -46,7 +46,8 @@ async def handle_repo(repo):
         await upsert_information(repo, latest['name'])
 
 
-# asyncio.run(consume_queue(QUEUE_NAME, handle_repo)) # TODO - why isn't this working?
-loop = asyncio.get_event_loop()
-loop.run_until_complete(consume_queue(QUEUE_NAME, handle_repo))
-loop.close()
+if __name__ == '__main__':
+    # asyncio.run(consume_queue(QUEUE_NAME, handle_repo)) # TODO - why isn't this working?
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(consume_queue(QUEUE_NAME, handle_repo))
+    loop.close()

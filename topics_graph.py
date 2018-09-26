@@ -34,4 +34,5 @@ async def handle_repo(repo_full_name):
         merge_information(session, repo_full_name, topics)
 
 
-asyncio.run(consume_queue(QUEUE_NAME, handle_repo))
+if __name__ == '__main__':
+    asyncio.run(consume_queue(QUEUE_NAME, handle_repo))

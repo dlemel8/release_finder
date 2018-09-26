@@ -4,7 +4,7 @@ from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import ReturnDocument
 
-from common import get_request, consume_queue
+from common import get_request, Queue
 
 QUEUE_NAME = 'releases'
 RELEASES_URL_FORMAT = 'https://api.github.com/repos/{:s}/releases'
@@ -49,5 +49,5 @@ async def handle_repo(repo):
 if __name__ == '__main__':
     # asyncio.run(consume_queue(QUEUE_NAME, handle_repo)) # TODO - why isn't this working?
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(consume_queue(QUEUE_NAME, handle_repo))
+    loop.run_until_complete(Queue.consume(QUEUE_NAME, handle_repo))
     loop.close()

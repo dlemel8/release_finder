@@ -1,6 +1,6 @@
 import asyncio
 
-from common import Queue
+from common import get_request, Queue
 
 DEFAULT_REPOS = [
     'python/cpython',
@@ -18,6 +18,24 @@ DEFAULT_REPOS = [
     'haproxy/haproxy',
 ]
 
+URL_FORMAT = 'https://api.github.com/repos/{:s}'
+
+
+async def verify(repos):
+    requests = [get_request(URL_FORMAT.format(r)) for r in repos]
+    responses = await asyncio.gather(*requests, loop=asyncio.get_running_loop(), return_exceptions=True)
+    return [x['full_name'] for x in responses if 'full_name' in x]
+
+
+async def main(repos):
+    print(f'repos are {repos}')
+
+    verified = await verify(repos)
+    print(f'verified repos are {verified}')
+
+    await Queue.publish(*verified)
+
+
 if __name__ == '__main__':
     import argparse
 
@@ -25,6 +43,4 @@ if __name__ == '__main__':
     parser.add_argument('repos', metavar='<OWNER>/<REPO>', nargs='*', default=DEFAULT_REPOS,
                         help='github repo to process, e.g. "docker/docker-ce"')
     args = parser.parse_args()
-
-    print(f'repos are {args.repos}')
-    asyncio.run(Queue.publish(*args.repos))
+    asyncio.run(main(args.repos))

@@ -1,6 +1,15 @@
 version: "3"
 
 services:
+  app:
+    build: .
+    depends_on:
+      - tasks_queue
+      - releases_db
+      - topics_db
+    network_mode: host
+    restart: always
+
   tasks_queue:
     image: rabbitmq:3.7.8-management-alpine
     network_mode: host

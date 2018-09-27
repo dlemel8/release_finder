@@ -2,7 +2,7 @@ import asyncio
 
 import latest_release
 import topics_graph
-from common import Queue
+from common import MessageQueue
 
 
 async def main():
@@ -10,7 +10,7 @@ async def main():
     for module in [latest_release, topics_graph]:
         queue_name = getattr(module, 'QUEUE_NAME')
         process_message_func = getattr(module, 'handle_repo')
-        futures.append(Queue.consume(queue_name, process_message_func))
+        futures.append(MessageQueue.consume(queue_name, process_message_func))
     await asyncio.wait(futures)
 
 

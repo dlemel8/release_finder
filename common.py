@@ -11,7 +11,7 @@ async def get_request(url, headers=None):
             return await response.json()
 
 
-class Queue(object):
+class MessageQueue(object):
     @classmethod
     async def consume(cls, queue_name, process_message_func):
         connection = await cls._connect_rabbitmq()

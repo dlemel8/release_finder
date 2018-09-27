@@ -1,6 +1,6 @@
 import asyncio
 
-from common import get_request, Queue
+from common import get_request, MessageQueue
 
 DEFAULT_REPOS = [
     'python/cpython',
@@ -33,7 +33,7 @@ async def main(repos):
     verified = await verify(repos)
     print(f'verified repos are {verified}')
 
-    await Queue.publish(*verified)
+    await MessageQueue.publish(*verified)
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ import asyncio
 
 from neo4j.v1 import GraphDatabase
 
-from common import get_request, Queue
+from common import get_request, MessageQueue
 
 QUEUE_NAME = 'topics'
 TOPICS_URL_FORMAT = 'https://api.github.com/repos/{:s}/topics'
@@ -35,4 +35,4 @@ async def handle_repo(repo_full_name):
 
 
 if __name__ == '__main__':
-    asyncio.run(Queue.consume(QUEUE_NAME, handle_repo))
+    asyncio.run(MessageQueue.consume(QUEUE_NAME, handle_repo))
